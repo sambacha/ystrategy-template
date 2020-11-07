@@ -8,3 +8,6 @@ coverage.json
 build
 .solidity-ci
 .contractshark.js
+yarn-error.log
+*.log
+
