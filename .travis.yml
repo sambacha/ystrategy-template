@@ -1,14 +1,17 @@
+# travis-ci
+os: linux
+dist: xenial
 language: node_js
 
 node_js:
+  - 10
   - 12
 
-install:
-  - yarn global add codecov
+git:
+  quiet: true
+cache: yarn
 
-script:
-  - touch .infura
-  - touch .secret
-  - yarn
-  - yarn coverage
-  - codecov
+install:
+  - yarn install
+  
+script: true

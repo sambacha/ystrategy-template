@@ -1,7 +1,7 @@
 <!-- copyright 2020 yearn.finance && the contributors -->
 <p align="center">
  <img src="https://raw.githubusercontent.com/gist/sambacha/9a62174a080ead34271ff5d187a24343/raw/02cad2900f4cedb87895cc57729030e095d2869f/gh_banner.svg" align="right" width="350">
-	<h1 align="left">yEarn Interface Contracts Package</h1>
+	<h1 align="left">Strategy TypeScript Template [Yearn Suite]</h1>
  <h3 align="center"> </h3>
  <p align="center">
 <align="center">
@@ -13,8 +13,6 @@
 </p>
 <br />
 <br />
-
-# Strategy TypeScript Template [Yearn Suite]
 
 ## Developer Tools 🛠️
 
