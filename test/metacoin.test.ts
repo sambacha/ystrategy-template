@@ -1,26 +1,26 @@
-import { MetaCoinInstance } from '../types/truffle-contracts';
+import { MetaCoinInstance } from "../types/truffle-contracts";
 
-const BN = require('bn.js');
-const chai = require('chai');
-const { expect } = require('chai');
-const MetaCoin = artifacts.require('MetaCoin');
+const BN = require("bn.js");
+const chai = require("chai");
+const { expect } = require("chai");
+const MetaCoin = artifacts.require("MetaCoin");
 
-chai.use(require('chai-bn')(BN));
+chai.use(require("chai-bn")(BN));
 
-contract('MetaCoin', (accounts) => {
+contract("MetaCoin", (accounts) => {
   let metaCoinInstance: MetaCoinInstance;
 
   beforeEach(async () => {
     metaCoinInstance = await MetaCoin.new();
   });
 
-  it('should put 10000 MetaCoin in the first account', async () => {
+  it("should put 10000 MetaCoin in the first account", async () => {
     const balance = await metaCoinInstance.getBalance(accounts[0]);
 
-    expect(balance.valueOf()).to.be.a.bignumber.that.equals(new BN('10000'));
+    expect(balance.valueOf()).to.be.a.bignumber.that.equals(new BN("10000"));
   });
 
-  it('should call a function that depends on a linked library', async () => {
+  it("should call a function that depends on a linked library", async () => {
     const metaCoinBalance = await metaCoinInstance.getBalance(accounts[0]);
 
     const metaCoinEthBalance = await metaCoinInstance.getBalanceInEth(
@@ -28,11 +28,11 @@ contract('MetaCoin', (accounts) => {
     );
 
     expect(metaCoinEthBalance).to.be.a.bignumber.that.equals(
-      new BN(metaCoinBalance).mul(new BN('2')),
+      new BN(metaCoinBalance).mul(new BN("2")),
     );
   });
 
-  it('should send coin correctly', async () => {
+  it("should send coin correctly", async () => {
     // Setup 2 accounts.
     const [accountOne, accountTwo] = accounts;
 
