@@ -2,7 +2,7 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
-import {BaseStrategy, StrategyParams} from "../BaseStrategy.sol";
+import { BaseStrategy, StrategyParams } from "../BaseStrategy.sol";
 
 /*
  * This Strategy serves as both a mock Strategy for testing, and an example
@@ -12,7 +12,7 @@ import {BaseStrategy, StrategyParams} from "../BaseStrategy.sol";
 contract TestStrategy is BaseStrategy {
     constructor(address _vault) public BaseStrategy(_vault) {}
 
-    function name() external override pure returns (string memory) {
+    function name() external pure override returns (string memory) {
         return "TestStrategy";
     }
 
@@ -24,16 +24,21 @@ contract TestStrategy is BaseStrategy {
         want.transfer(msg.sender, amount);
     }
 
-    function estimatedTotalAssets() public override view returns (uint256) {
+    function estimatedTotalAssets() public view override returns (uint256) {
         // For mock, this is just everything we have
         return want.balanceOf(address(this));
     }
 
-    function prepareReturn(uint256 _debtOutstanding) internal override returns (uint256 _profit) {
+    function prepareReturn(uint256 _debtOutstanding)
+        internal
+        override
+        returns (uint256 _profit)
+    {
         // During testing, send this contract some tokens to simulate "Rewards"
         uint256 reserve = getReserve();
         uint256 total = want.balanceOf(address(this));
-        if (total > reserve.add(_debtOutstanding)) _profit = total.sub(reserve).sub(_debtOutstanding);
+        if (total > reserve.add(_debtOutstanding))
+            _profit = total.sub(reserve).sub(_debtOutstanding);
     }
 
     function adjustPosition(uint256 _debtOutstanding) internal override {
@@ -46,7 +51,11 @@ contract TestStrategy is BaseStrategy {
         }
     }
 
-    function liquidatePosition(uint256 _amountNeeded) internal override returns (uint256 _amountFreed) {
+    function liquidatePosition(uint256 _amountNeeded)
+        internal
+        override
+        returns (uint256 _amountFreed)
+    {
         uint256 reserve = getReserve();
         if (_amountNeeded >= reserve) {
             // Give back the entire reserves
@@ -60,7 +69,11 @@ contract TestStrategy is BaseStrategy {
 
     function exitPosition() internal override {
         // Dump 1/N of original position each time this is called
-        setReserve(want.balanceOf(address(this)).mul(countdownTimer.sub(1)).div(countdownTimer));
+        setReserve(
+            want.balanceOf(address(this)).mul(countdownTimer.sub(1)).div(
+                countdownTimer
+            )
+        );
         countdownTimer = countdownTimer.sub(1); // NOTE: This should never be called after it hits 0
     }
 
@@ -68,7 +81,12 @@ contract TestStrategy is BaseStrategy {
         // Nothing needed here because no additional tokens/tokenized positions for mock
     }
 
-    function protectedTokens() internal override view returns (address[] memory) {
+    function protectedTokens()
+        internal
+        view
+        override
+        returns (address[] memory)
+    {
         return new address[](0); // No additional tokens/tokenized positions for mock
     }
 }

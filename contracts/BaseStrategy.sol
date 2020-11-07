@@ -20,7 +20,10 @@ interface VaultAPI is IERC20 {
 
     function token() external view returns (address);
 
-    function strategies(address _strategy) external view returns (StrategyParams memory);
+    function strategies(address _strategy)
+        external
+        view
+        returns (StrategyParams memory);
 
     /*
      * View how much the Vault would increase this strategy's borrow limit,
@@ -122,7 +125,7 @@ abstract contract BaseStrategy {
     // Name of this contract's Strategy (Must override!)
     // NOTE: You can use this field to manage the "version" of this strategy
     //       e.g. `StrategySomethingOrOtherV1`. It's up to you!
-    function name() external virtual pure returns (string memory);
+    function name() external pure virtual returns (string memory);
 
     VaultAPI public vault;
     address public strategist;
@@ -167,27 +170,42 @@ abstract contract BaseStrategy {
     }
 
     function setStrategist(address _strategist) external {
-        require(msg.sender == strategist || msg.sender == governance(), "!authorized");
+        require(
+            msg.sender == strategist || msg.sender == governance(),
+            "!authorized"
+        );
         strategist = _strategist;
     }
 
     function setKeeper(address _keeper) external {
-        require(msg.sender == strategist || msg.sender == governance(), "!authorized");
+        require(
+            msg.sender == strategist || msg.sender == governance(),
+            "!authorized"
+        );
         keeper = _keeper;
     }
 
     function setMinReportDelay(uint256 _delay) external {
-        require(msg.sender == strategist || msg.sender == governance(), "!authorized");
+        require(
+            msg.sender == strategist || msg.sender == governance(),
+            "!authorized"
+        );
         minReportDelay = _delay;
     }
 
     function setProfitFactor(uint256 _profitFactor) external {
-        require(msg.sender == strategist || msg.sender == governance(), "!authorized");
+        require(
+            msg.sender == strategist || msg.sender == governance(),
+            "!authorized"
+        );
         profitFactor = _profitFactor;
     }
 
     function setDebtThreshold(uint256 _debtThreshold) external {
-        require(msg.sender == strategist || msg.sender == governance(), "!authorized");
+        require(
+            msg.sender == strategist || msg.sender == governance(),
+            "!authorized"
+        );
         debtThreshold = _debtThreshold;
     }
 
@@ -217,7 +235,7 @@ abstract contract BaseStrategy {
      *       based on sudden withdrawals. This value should be higher than the total debt of
      *       the strategy and higher than it's expected value to be "safe".
      */
-    function estimatedTotalAssets() public virtual view returns (uint256);
+    function estimatedTotalAssets() public view virtual returns (uint256);
 
     /*
      * Perform any strategy unwinding or other calls necessary to capture
@@ -229,7 +247,10 @@ abstract contract BaseStrategy {
      * strategy and reduce it's overall position if lower than expected returns
      * are sustained for long periods of time.
      */
-    function prepareReturn(uint256 _debtOutstanding) internal virtual returns (uint256 _profit);
+    function prepareReturn(uint256 _debtOutstanding)
+        internal
+        virtual
+        returns (uint256 _profit);
 
     /*
      * Perform any adjustments to the core position(s) of this strategy given
@@ -270,7 +291,7 @@ abstract contract BaseStrategy {
      *
      * NOTE: this call and `harvestTrigger` should never return `true` at the same time.
      */
-    function tendTrigger(uint256 callCost) public virtual view returns (bool) {
+    function tendTrigger(uint256 callCost) public view virtual returns (bool) {
         // We usually don't need tend, but if there are positions that need active maintainence,
         // overriding this function is how you would signal for that
         return false;
@@ -278,7 +299,12 @@ abstract contract BaseStrategy {
 
     function tend() external {
         if (keeper != address(0)) {
-            require(msg.sender == keeper || msg.sender == strategist || msg.sender == governance(), "!authorized");
+            require(
+                msg.sender == keeper ||
+                    msg.sender == strategist ||
+                    msg.sender == governance(),
+                "!authorized"
+            );
         }
 
         // Don't take profits with this call, but adjust for better gains
@@ -297,7 +323,12 @@ abstract contract BaseStrategy {
      *
      * NOTE: this call and `tendTrigger` should never return `true` at the same time.
      */
-    function harvestTrigger(uint256 callCost) public virtual view returns (bool) {
+    function harvestTrigger(uint256 callCost)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         StrategyParams memory params = vault.strategies(address(this));
 
         // Should not trigger if strategy is not activated
@@ -327,7 +358,12 @@ abstract contract BaseStrategy {
 
     function harvest() external {
         if (keeper != address(0)) {
-            require(msg.sender == keeper || msg.sender == strategist || msg.sender == governance(), "!authorized");
+            require(
+                msg.sender == keeper ||
+                    msg.sender == strategist ||
+                    msg.sender == governance(),
+                "!authorized"
+            );
         }
 
         uint256 profit = 0;
@@ -338,11 +374,14 @@ abstract contract BaseStrategy {
             profit = prepareReturn(vault.debtOutstanding()); // Free up returns for Vault to pull
         }
 
-        if (reserve > want.balanceOf(address(this))) reserve = want.balanceOf(address(this));
+        if (reserve > want.balanceOf(address(this)))
+            reserve = want.balanceOf(address(this));
 
         // Allow Vault to take up to the "harvested" balance of this contract, which is
         // the amount it has earned since the last time it reported to the Vault
-        uint256 outstanding = vault.report(want.balanceOf(address(this)).sub(reserve));
+        uint256 outstanding = vault.report(
+            want.balanceOf(address(this)).sub(reserve)
+        );
 
         // Check if free returns are left, and re-invest them
         adjustPosition(outstanding);
@@ -354,7 +393,10 @@ abstract contract BaseStrategy {
      * Liquidate as many assets as possible to `want`, irregardless of slippage,
      * up to `_amountNeeded`. Any excess should be re-invested here as well.
      */
-    function liquidatePosition(uint256 _amountNeeded) internal virtual returns (uint256 _amountFreed);
+    function liquidatePosition(uint256 _amountNeeded)
+        internal
+        virtual
+        returns (uint256 _amountFreed);
 
     function withdraw(uint256 _amountNeeded) external {
         require(msg.sender == address(vault), "!vault");
@@ -380,11 +422,15 @@ abstract contract BaseStrategy {
     }
 
     function setEmergencyExit() external {
-        require(msg.sender == strategist || msg.sender == governance(), "!authorized");
+        require(
+            msg.sender == strategist || msg.sender == governance(),
+            "!authorized"
+        );
         emergencyExit = true;
         exitPosition();
         vault.revokeStrategy();
-        if (reserve > want.balanceOf(address(this))) reserve = want.balanceOf(address(this));
+        if (reserve > want.balanceOf(address(this)))
+            reserve = want.balanceOf(address(this));
     }
 
     // Override this to add all tokens/tokenized positions this contract manages
@@ -400,15 +446,19 @@ abstract contract BaseStrategy {
     //      protected[2] = tokenC;
     //      return protected;
     //    }
-    function protectedTokens() internal virtual view returns (address[] memory);
+    function protectedTokens() internal view virtual returns (address[] memory);
 
     function sweep(address _token) external {
         require(msg.sender == governance(), "!authorized");
         require(_token != address(want), "!want");
 
         address[] memory _protectedTokens = protectedTokens();
-        for (uint256 i; i < _protectedTokens.length; i++) require(_token != _protectedTokens[i], "!protected");
+        for (uint256 i; i < _protectedTokens.length; i++)
+            require(_token != _protectedTokens[i], "!protected");
 
-        IERC20(_token).transfer(governance(), IERC20(_token).balanceOf(address(this)));
+        IERC20(_token).transfer(
+            governance(),
+            IERC20(_token).balanceOf(address(this))
+        );
     }
 }
