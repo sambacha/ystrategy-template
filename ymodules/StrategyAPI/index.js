@@ -1,5 +1,6 @@
+// Yearn Strategy API
+// TODO - migrate from web3 to ethers-js
 const StrategyAPIArtifacts = require("../../build/contracts/StrategyAPI.json");
-
 const Web3 = require("web3");
 const BN = Web3.utils.BN;
 const ZeroClientProvider = require("web3-provider-engine/zero.js");
@@ -27,9 +28,9 @@ class StrategyAPI {
     if (this.options.autoInit) this.initWeb3();
   }
 
-  // hello world : )
-  helloWorld() {
-    console.log("hello world!");
+  // StrategyAPI
+  StrategyAPI() {
+    console.log("Yearn StrategyAPI Loading... ");
   }
 
   /*
