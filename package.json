@@ -1,8 +1,8 @@
 {
   "name": "your-strategy-package.name",
   "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/${USER}/${REPO}.git",
+  "main": "src/StrategyAPI/index.js",
+  "repository": "https://github.com/sambacha/ystrategy-template.git",
   "license": "MIT",
   "scripts": {
     "compile": "yarn truffle compile && yarn typechain --target truffle './build/**/*.json'",
@@ -31,7 +31,8 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "3.1.0"
+    "@openzeppelin/contracts": "^3.2.0",
+    "web3-provider-engine": "^16.0.1"
   },
-  "public": "false"
+  "public": "true"
 }
